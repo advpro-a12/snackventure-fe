@@ -10,6 +10,9 @@ export default function Home() {
 			<li>
 				<a href="http://35.240.228.93/">review service</a>
 			</li>
+			<li>
+				<a href="http://34.87.81.229/">atuh service</a>
+			</li>
 		</ul>
 	);
 }
