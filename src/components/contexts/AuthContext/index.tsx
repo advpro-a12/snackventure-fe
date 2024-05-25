@@ -66,7 +66,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 		username: string;
 		password: string;
 	}) {
-		setIsAuthenticated(true);
 		const response = await customFetch<{
 			accessToken: string;
 			tokenType: string;
@@ -84,8 +83,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 			setIsAuthenticated(true);
 			router.push("/home");
 		} else {
-			console.log(response);
-			toast("Username or password incorrect.");
+			toast("Username or password is incorrect.");
 		}
 	}
 
@@ -98,7 +96,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 	useEffect(() => {
 		setIsLoading(true);
 		const isAuthenticatedLocalStorage = getCookie("AT");
-		console.log(isAuthenticatedLocalStorage);
 
 		if (!isAuthenticatedLocalStorage) {
 			setIsAuthenticated(false);
