@@ -25,6 +25,7 @@ const MySnackBoxModule = () => {
 	}, [isAuthenticated, isLoading, router, userRoles]);
 
 	useEffect(() => {
+		if (!userId) return;
 		customFetch<SubscriptionProps[]>(
 			"http://35.198.232.212",
 			`/subscriptions/customer/${userId}`,
@@ -63,7 +64,7 @@ const MySnackBoxModule = () => {
 				setSubscriptions(subscriptionsWithBox);
 			});
 		});
-	}, [customFetch, userRoles, userId]);
+	});
 
 	const unsubscribe = (subscriptionId: string, subscriptionStatus: string) => {
 		if (subscriptionStatus === "CANCELLED") {
@@ -96,9 +97,9 @@ const MySnackBoxModule = () => {
 	}, [filterStatus, subscriptions]);
 
 	return (
-		<div className="mt-20 w-full h-[calc(100vh-80px)] overflow-auto container">
+		<div className="flex justify-center">
 			<select
-				className="w-52 h-8 mt-2 mb-2 pl-2 pr-2 border rounded border-gray-300"
+				className="w-52 h-8 my-2 mt-5 px-2 border rounded border-gray fixed top-0"
 				value={filterStatus}
 				onChange={(e) => setFilterStatus(e.target.value)}
 			>
@@ -106,36 +107,37 @@ const MySnackBoxModule = () => {
 				<option value="PENDING">Pending</option>
 				<option value="CANCELLED">Cancelled</option>
 				<option value="SUBSCRIBED">Subscribed</option>
-				{/* Add more options as needed */}
 			</select>
-			<div className="flex flex-col gap-2">
-				{filteredSubscriptions.map((subscription, index) => (
-					<Card
-						key={index}
-						imageUrl={subscription.boxImageUrl}
-						title={`${subscription.boxName} (${subscription.boxCountry}) | Subscription Code: ${subscription.subscriptionCode}`}
-						description={`Frequency: ${subscription.frequency} | Status: ${
-							subscription.subscriptionStatus
-						} | Approval: ${subscription.approvalStatus} | Start: ${
-							subscription.startDate
-								? new Date(subscription.startDate).toLocaleDateString()
-								: "N/A"
-						} | End: ${
-							subscription.endDate
-								? new Date(subscription.endDate).toLocaleDateString()
-								: "N/A"
-						}`}
-					>
-						<Button
-							variant="red"
-							onClick={() =>
-								unsubscribe(subscription.id, subscription.subscriptionStatus)
-							}
+			<div className="mt-20 w-full h-[calc(100vh-80px)] overflow-auto container">
+				<div className="flex flex-col gap-2">
+					{filteredSubscriptions.map((subscription, index) => (
+						<Card
+							key={index}
+							imageUrl={subscription.boxImageUrl}
+							title={`${subscription.boxName} (${subscription.boxCountry}) | Subscription Code: ${subscription.subscriptionCode}`}
+							description={`Frequency: ${subscription.frequency} | Status: ${
+								subscription.subscriptionStatus
+							} | Approval: ${subscription.approvalStatus} | Start: ${
+								subscription.startDate
+									? new Date(subscription.startDate).toLocaleDateString()
+									: "N/A"
+							} | End: ${
+								subscription.endDate
+									? new Date(subscription.endDate).toLocaleDateString()
+									: "N/A"
+							}`}
 						>
-							Unsubscribe
-						</Button>
-					</Card>
-				))}
+							<Button
+								variant="red"
+								onClick={() =>
+									unsubscribe(subscription.id, subscription.subscriptionStatus)
+								}
+							>
+								Unsubscribe
+							</Button>
+						</Card>
+					))}
+				</div>
 			</div>
 		</div>
 	);

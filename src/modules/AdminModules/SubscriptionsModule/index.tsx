@@ -58,30 +58,51 @@ const SubscriptionsModule = () => {
 		});
 	});
 
-	const handleApprove = (id: string, approvalStatus: string) => {
-		if (approvalStatus !== "PENDING") {
+	const handleSubscriptionStatusChange = (
+		id: string,
+		approvalStatus: string,
+		subscriptionStatus: string,
+		newStatus: "APPROVED" | "REJECTED"
+	) => {
+		if (approvalStatus === "PENDING" && subscriptionStatus === "CANCELLED") {
+			toast(`Subscription is already ${subscriptionStatus}`);
+			return;
+		} else if (approvalStatus !== "PENDING") {
 			toast(`Subscription is already ${approvalStatus}`);
 			return;
 		}
 
 		customFetch("http://35.198.232.212", `/subscriptions/${id}/change-status`, {
 			method: "PUT",
-			body: JSON.stringify({ status: "APPROVED" }),
+			body: JSON.stringify({ status: newStatus }),
 			isAuthorized: true,
-		}).then(() => toast("Subscription approved."));
+		}).then(() => toast(`Subscription ${newStatus.toLowerCase()}.`));
 	};
 
-	const handleReject = (id: string, approvalStatus: string) => {
-		if (approvalStatus !== "PENDING") {
-			toast(`Subscription is already ${approvalStatus}`);
-			return;
-		}
+	const handleApprove = (
+		id: string,
+		approvalStatus: string,
+		subscriptionStatus: string
+	) => {
+		handleSubscriptionStatusChange(
+			id,
+			approvalStatus,
+			subscriptionStatus,
+			"APPROVED"
+		);
+	};
 
-		customFetch("http://35.198.232.212", `/subscriptions/${id}/change-status`, {
-			method: "PUT",
-			body: JSON.stringify({ status: "REJECTED" }),
-			isAuthorized: true,
-		}).then(() => toast("Subscription rejected."));
+	const handleReject = (
+		id: string,
+		approvalStatus: string,
+		subscriptionStatus: string
+	) => {
+		handleSubscriptionStatusChange(
+			id,
+			approvalStatus,
+			subscriptionStatus,
+			"REJECTED"
+		);
 	};
 
 	return (
@@ -91,14 +112,23 @@ const SubscriptionsModule = () => {
 					<Card
 						key={index}
 						title={subscription.subscriptionCode}
-						description={`Status: ${subscription.approvalStatus} - Customer: ${subscription.customerName}`}
+						description={`Status: ${
+							subscription.approvalStatus === "PENDING" &&
+							subscription.subscriptionStatus === "CANCELLED"
+								? subscription.subscriptionStatus
+								: subscription.approvalStatus
+						} - Customer: ${subscription.customerName}`}
 					>
 						<div className="flex gap-4">
 							<Button
 								variant="red"
 								size="sm"
 								onClick={() =>
-									handleReject(subscription.id, subscription.approvalStatus)
+									handleReject(
+										subscription.id,
+										subscription.approvalStatus,
+										subscription.subscriptionStatus
+									)
 								}
 							>
 								Reject
@@ -107,7 +137,11 @@ const SubscriptionsModule = () => {
 								variant="green"
 								size="sm"
 								onClick={() =>
-									handleApprove(subscription.id, subscription.approvalStatus)
+									handleApprove(
+										subscription.id,
+										subscription.approvalStatus,
+										subscription.subscriptionStatus
+									)
 								}
 							>
 								Approve
