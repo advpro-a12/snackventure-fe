@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "@/components/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { ReviewProps, UserProps,SubscriptionBoxProps } from "./interface";
+import { ReviewProps, UserProps, SubscriptionBoxProps } from "./interface";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -26,62 +26,62 @@ const ReviewsModule = () => {
         }
     }, [isAuthenticated]);
 
-	const fetchReviews = async () => {
-		try {
-			const response = await customFetch<ReviewProps[]>(
-				"http://35.240.228.93",
-				`/review/reviews`,
-				{
-					isAuthorized: true,
-				}
-			);
-	
-			if (response) {
-				const responseData = Object.values(response);
-				const validReviews = responseData.filter(review => review !== undefined && review.subscriptionBoxId !== undefined);
-	
-				const usernames = await Promise.all(
-					validReviews.map(review =>
-						customFetch<UserProps>(
-							"http://34.87.81.229",
-							`/auth/user/${review.userId}`,
-							{
-								isAuthorized: true,
-							}
-						).then(user => user.username)
-					)
-				);
-	
-				const boxnames = await Promise.all(
-					validReviews.map(review =>
-						customFetch<SubscriptionBoxProps>(
-							"http://34.87.37.109",
-							`/subscription-box/${review.subscriptionBoxId}`,
-							{
-								isAuthorized: true,
-							}
-						).then((box: any) => ({
-							name: box.name,
-							imageUrl: box.imageUrl,
-							country: box.country,
-						}))
-					)
-				);
-	
-				const reviewsWithUsernamesAndBoxnames = validReviews.map((review, index) => ({
-					...review,
-					username: usernames[index],
-					boxname: boxnames[index].name
-				}));
-	
-				setReviews(reviewsWithUsernamesAndBoxnames);
-			} else {
-				console.error("Failed to fetch reviews: No response");
-			}
-		} catch (error) {
-			console.error("Failed to fetch reviews:", error);
-		}
-	};
+    const fetchReviews = async () => {
+        try {
+            const response = await customFetch<ReviewProps[]>(
+                "http://35.240.228.93",
+                `/review/reviews`,
+                {
+                    isAuthorized: true,
+                }
+            );
+
+            if (response) {
+                const responseData = Object.values(response);
+                const validReviews = responseData.filter(review => review !== undefined && review.subscriptionBoxId !== undefined);
+
+                const usernames = await Promise.all(
+                    validReviews.map(review =>
+                        customFetch<UserProps>(
+                            "http://34.87.81.229",
+                            `/auth/user/${review.userId}`,
+                            {
+                                isAuthorized: true,
+                            }
+                        ).then(user => user.username)
+                    )
+                );
+
+                const boxnames = await Promise.all(
+                    validReviews.map(review =>
+                        customFetch<SubscriptionBoxProps>(
+                            "http://34.87.37.109",
+                            `/subscription-box/${review.subscriptionBoxId}`,
+                            {
+                                isAuthorized: true,
+                            }
+                        ).then((box: any) => ({
+                            name: box.name,
+                            imageUrl: box.imageUrl,
+                            country: box.country,
+                        }))
+                    )
+                );
+
+                const reviewsWithUsernamesAndBoxnames = validReviews.map((review, index) => ({
+                    ...review,
+                    username: usernames[index],
+                    boxname: boxnames[index].name
+                }));
+
+                setReviews(reviewsWithUsernamesAndBoxnames);
+            } else {
+                console.error("Failed to fetch reviews: No response");
+            }
+        } catch (error) {
+            console.error("Failed to fetch reviews:", error);
+        }
+    };
 
     const handleApprove = async (idReview: string, reviewStatus: string) => {
         if (reviewStatus !== "PENDING") {
@@ -151,7 +151,7 @@ const ReviewsModule = () => {
     return (
         <div className="mt-20 w-full h-[calc(100vh-80px)] overflow-auto container font-raleway">
             <h1 className="text-4xl font-bold mb-8">Welcome, {username}</h1>
-            <p className="text-xl mb-8">Here's the list of all reviews</p>
+            <p className="text-xl mb-8">Here&apos;s the list of all reviews</p>
             {reviews.length === 0 ? (
                 <p>No reviews found.</p>
             ) : (
