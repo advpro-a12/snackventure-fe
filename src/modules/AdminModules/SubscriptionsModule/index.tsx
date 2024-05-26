@@ -42,7 +42,7 @@ const SubscriptionsModule = () => {
 						{
 							isAuthorized: true,
 						}
-					).then((user) => user.username)
+					).then((user: any) => user.username)
 				)
 			).then((usernames) => {
 				const subscriptionsWithCustomerName = subscriptions.map(
