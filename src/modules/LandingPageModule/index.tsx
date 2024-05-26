@@ -13,8 +13,8 @@ const LandingPageModule = () => {
 				height={300}
 				className="object-contain"
 			/>
-			<Link href={"/auth/register"}>
-				<Button className="px-[100px] py-4 text-2xl mt-[-32px]">
+			<Link href={"/auth/register"} className=" mt-[-32px]">
+				<Button className="px-[100px] py-4 text-2xl">
 					Start your snackventure!
 				</Button>
 			</Link>

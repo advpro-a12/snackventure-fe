@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { setCookie, deleteCookie, getCookie } from "cookies-next";
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
+import { extractDetails } from "@/lib/utils";
 
 const AuthContext = createContext({} as AuthContextInterface);
 
@@ -18,6 +19,9 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [username, setUsername] = useState<string>("");
+	const [userId, setUserId] = useState<string>("");
+	const [userRoles, setUserRoles] = useState<string[]>([]);
 
 	const router = useRouter();
 
@@ -81,7 +85,15 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 		if (response.status === 200) {
 			setCookie("AT", response.accessToken);
 			setIsAuthenticated(true);
-			router.push("/home");
+			const { username, userId, roles } = extractDetails(response.accessToken);
+			setUsername(username);
+			setUserId(userId);
+			setUserRoles(roles);
+			if (roles.includes("ADMIN")) {
+				router.replace("/snackboxes");
+			} else {
+				router.replace("/home");
+			}
 		} else {
 			toast("Username or password is incorrect.");
 		}
@@ -95,12 +107,16 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 
 	useEffect(() => {
 		setIsLoading(true);
-		const isAuthenticatedLocalStorage = getCookie("AT");
+		const token = getCookie("AT");
 
-		if (!isAuthenticatedLocalStorage) {
+		if (!token) {
 			setIsAuthenticated(false);
 		} else {
 			setIsAuthenticated(true);
+			const { username, userId, roles } = extractDetails(token);
+			setUsername(username);
+			setUserId(userId);
+			setUserRoles(roles);
 		}
 		setIsLoading(false);
 	}, [router]);
@@ -112,6 +128,12 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 		login,
 		logout,
 		customFetch,
+		username,
+		setUsername,
+		userId,
+		setUserId,
+		userRoles,
+		setUserRoles,
 	};
 
 	return (
