@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image"; 
 
 const EditReviewModule = ({ idReview }: { idReview: string }) => {
-    const { customFetch, isAuthenticated, isLoading, userRoles, userId, username } = useAuthContext();
+    const { customFetch, isAuthenticated, isLoading, userRoles, userId } = useAuthContext();
     const router = useRouter();
 
     const [formData, setFormData] = useState<EditReviewFormData>({
@@ -18,7 +18,7 @@ const EditReviewModule = ({ idReview }: { idReview: string }) => {
     });
 
     useEffect(() => {
-        if (!isLoading && (!isAuthenticated || !userRoles.includes("CUSTOMER"))) {
+        if (!isLoading && (!isAuthenticated || (!userRoles.includes("CUSTOMER") && !userRoles.includes("ADMIN")))) {
             router.push("/");
         }
     }, [isAuthenticated, isLoading, router, userRoles]);
@@ -46,9 +46,13 @@ const EditReviewModule = ({ idReview }: { idReview: string }) => {
             console.error("Failed to update review:", error);
         }
     };
-
+    
     const handleCancel = () => {
-        router.push("/my-reviews");
+        if (userRoles.includes("ADMIN")) {
+            router.push("/reviews");
+        } else {
+            router.push("/my-reviews");
+        }
     };
 
     return (

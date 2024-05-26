@@ -6,7 +6,17 @@ export interface ReviewProps{
     createdDate: string;
     subscriptionBoxId: string;
     reviewStatus: string;
-    boxname?: string;
+    username?: string;
+    boxname?: string
+}
+
+export interface UserProps {
+    id: string;
+    username: string;
+    email: string;
+    phoneNumber: string;
+    address: string;
+    userRole: string;
 }
 
 export interface SubscriptionBoxProps {

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "@/components/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { ReviewProps } from "./interface";
+import { ReviewProps,SubscriptionBoxProps } from "./interface";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -11,6 +11,7 @@ const MyReviewsModule = () => {
     const { isAuthenticated, isLoading, userRoles, userId, username, customFetch } = useAuthContext();
     const router = useRouter();
     const [reviews, setReviews] = useState<ReviewProps[]>([]);
+    const [groupedReviews, setGroupedReviews] = useState<{ [key: string]: ReviewProps[] }>({});
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
 
@@ -22,42 +23,66 @@ const MyReviewsModule = () => {
 
     useEffect(() => {
         if (isAuthenticated && userRoles.includes("CUSTOMER") && userId) {
-            fetchReviews(userId);
+            fetchReviews();
         }
     }, [isAuthenticated, userRoles, userId]);
 
-    const fetchReviews = async (userId: string) => {
-        try {
-            const response = await customFetch<ReviewProps[]>(
-                "http://35.240.228.93",
-                `/review/user/${userId}`,
-                {
-                    isAuthorized: true,
-                }
-            );
-            if (response) {
-                const responseData = Object.values(response);
-                setReviews(responseData);
-            } else {
-                console.error("Failed to fetch reviews: No response");
-            }
-        } catch (error) {
-            console.error("Failed to fetch reviews:", error);
-        }
-    };
+    const fetchReviews = async () => {
+		try {
+			const response = await customFetch<any>(
+				"http://35.240.228.93",
+				`/review/reviews`,
+				{
+					isAuthorized: true,
+				}
+			);
 
-    const groupReviewsBySubscriptionBox = (reviews: ReviewProps[]) => {
-        return reviews.reduce((acc, review) => {
-            const { subscriptionBoxId } = review;
-            if (subscriptionBoxId) {
-                if (!acc[subscriptionBoxId]) {
-                    acc[subscriptionBoxId] = [];
-                }
-                acc[subscriptionBoxId].push(review);
-            }
-            return acc;
-        }, {} as { [key: string]: ReviewProps[] });
-    };
+			if (response) {
+				const responseData = Object.values(response);
+				const validReviews = responseData.filter(review => review !== undefined && review.subscriptionBoxId !== undefined);
+
+				const boxnames = await Promise.all(
+					validReviews.map(review =>
+						customFetch<any>(
+							"http://34.87.37.109",
+							`/subscription-box/${review.subscriptionBoxId}`,
+							{
+								isAuthorized: true,
+							}
+						).then((box: any) => ({
+							name: box.name,
+							imageUrl: box.imageUrl,
+							country: box.country,
+						}))
+					)
+				);
+
+				const reviewWithBoxNames = validReviews.map((review, index) => ({
+					...review,
+					boxnames: boxnames[index].name,
+					boxImageUrl: boxnames[index].imageUrl,
+					boxCountry: boxnames[index].country,
+				}));
+
+				setReviews(reviewWithBoxNames);
+				
+				const grouped = reviewWithBoxNames.reduce((acc, review) => {
+					const boxName = review.boxnames;
+					if (!acc[boxName]) {
+						acc[boxName] = [];
+					}
+					acc[boxName].push(review);
+					return acc;
+				}, {});
+				setGroupedReviews(grouped);
+			} else {
+				console.error("Failed to fetch reviews: No response");
+			}
+		} catch (error) {
+			console.error("Failed to fetch reviews:", error);
+		}
+	};
+
 
     const handleDelete = async () => {
         if (!reviewToDelete) return;
@@ -78,8 +103,7 @@ const MyReviewsModule = () => {
         }
     };
 
-    const groupedReviews = groupReviewsBySubscriptionBox(reviews);
-
+    
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -91,11 +115,11 @@ const MyReviewsModule = () => {
                 <p>No reviews found.</p>
             ) : (
                 <div>
-                    {Object.keys(groupedReviews).map((subscriptionBoxId) => (
-                        subscriptionBoxId !== 'undefined' && (
-                            <div key={subscriptionBoxId} className="text-l font-semibold mb-4 mt-2">
-                                <h2 className="text-xl font-bold mb-2">{subscriptionBoxId}</h2>
-                                {groupedReviews[subscriptionBoxId].map((review) => (
+                    {Object.keys(groupedReviews).map((boxName) => (
+                        boxName !== 'undefined' && (
+                            <div key={boxName} className="text-l font-semibold mb-4 mt-2">
+                                <h2 className="text-xl font-bold mb-2">{boxName}</h2>
+                                {groupedReviews[boxName].map((review) => (
                                     <div key={review.idReview} className="bg-black bg-opacity-50 p-4 rounded-lg mb-4 text-white">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center">
@@ -105,7 +129,7 @@ const MyReviewsModule = () => {
                                                     width={55}
                                                     height={55}
                                                 />
-                                                <div className="ml-4">
+                                                <div className="ml-4 ">
                                                     <span className="font-bold text-[36px]">{username}</span>
                                                     <div className="mt-1">
                                                         <span className="font-bold">Rating: </span>
@@ -114,6 +138,10 @@ const MyReviewsModule = () => {
                                                     <div className="mt-1">
                                                         <span className="font-bold">Review: </span>
                                                         <span className="font-semibold">{review.review}</span>
+                                                    </div>
+                                                    <div className="mt-1">
+                                                        <span className="font-bold">Status: </span>
+                                                        <span className="font-semibold">{review.reviewStatus}</span>
                                                     </div>
                                                 </div>
                                             </div>
