@@ -48,7 +48,7 @@ const ReviewsModule = () => {
                             {
                                 isAuthorized: true,
                             }
-                        ).then(user => user.username)
+                        ).then((user:any) => user.username)
                     )
                 );
 
