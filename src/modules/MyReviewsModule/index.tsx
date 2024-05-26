@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "@/components/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { ReviewProps,SubscriptionBoxProps } from "./interface";
+import { ReviewProps, SubscriptionBoxProps } from "./interface";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -28,61 +28,60 @@ const MyReviewsModule = () => {
     }, [isAuthenticated, userRoles, userId]);
 
     const fetchReviews = async () => {
-		try {
-			const response = await customFetch<any>(
-				"http://35.240.228.93",
-				`/review/reviews`,
-				{
-					isAuthorized: true,
-				}
-			);
+        try {
+            const response = await customFetch<any>(
+                "http://35.240.228.93",
+                `/review/reviews`,
+                {
+                    isAuthorized: true,
+                }
+            );
 
-			if (response) {
-				const responseData = Object.values(response);
-				const validReviews = responseData.filter(review => review !== undefined && review.subscriptionBoxId !== undefined);
+            if (response) {
+                const responseData = Object.values(response);
+                const validReviews = responseData.filter(review => review !== undefined && review.subscriptionBoxId !== undefined);
 
-				const boxnames = await Promise.all(
-					validReviews.map(review =>
-						customFetch<any>(
-							"http://34.87.37.109",
-							`/subscription-box/${review.subscriptionBoxId}`,
-							{
-								isAuthorized: true,
-							}
-						).then((box: any) => ({
-							name: box.name,
-							imageUrl: box.imageUrl,
-							country: box.country,
-						}))
-					)
-				);
+                const boxnames = await Promise.all(
+                    validReviews.map(review =>
+                        customFetch<any>(
+                            "http://34.87.37.109",
+                            `/subscription-box/${review.subscriptionBoxId}`,
+                            {
+                                isAuthorized: true,
+                            }
+                        ).then((box: any) => ({
+                            name: box.name,
+                            imageUrl: box.imageUrl,
+                            country: box.country,
+                        }))
+                    )
+                );
 
-				const reviewWithBoxNames = validReviews.map((review, index) => ({
-					...review,
-					boxnames: boxnames[index].name,
-					boxImageUrl: boxnames[index].imageUrl,
-					boxCountry: boxnames[index].country,
-				}));
+                const reviewWithBoxNames = validReviews.map((review, index) => ({
+                    ...review,
+                    boxnames: boxnames[index].name,
+                    boxImageUrl: boxnames[index].imageUrl,
+                    boxCountry: boxnames[index].country,
+                }));
 
-				setReviews(reviewWithBoxNames);
-				
-				const grouped = reviewWithBoxNames.reduce((acc, review) => {
-					const boxName = review.boxnames;
-					if (!acc[boxName]) {
-						acc[boxName] = [];
-					}
-					acc[boxName].push(review);
-					return acc;
-				}, {});
-				setGroupedReviews(grouped);
-			} else {
-				console.error("Failed to fetch reviews: No response");
-			}
-		} catch (error) {
-			console.error("Failed to fetch reviews:", error);
-		}
-	};
-
+                setReviews(reviewWithBoxNames);
+                
+                const grouped = reviewWithBoxNames.reduce((acc, review) => {
+                    const boxName = review.boxnames;
+                    if (!acc[boxName]) {
+                        acc[boxName] = [];
+                    }
+                    acc[boxName].push(review);
+                    return acc;
+                }, {});
+                setGroupedReviews(grouped);
+            } else {
+                console.error("Failed to fetch reviews: No response");
+            }
+        } catch (error) {
+            console.error("Failed to fetch reviews:", error);
+        }
+    };
 
     const handleDelete = async () => {
         if (!reviewToDelete) return;
@@ -129,7 +128,7 @@ const MyReviewsModule = () => {
                                                     width={55}
                                                     height={55}
                                                 />
-                                                <div className="ml-4 ">
+                                                <div className="ml-4">
                                                     <span className="font-bold text-[36px]">{username}</span>
                                                     <div className="mt-1">
                                                         <span className="font-bold">Rating: </span>
