@@ -47,7 +47,7 @@ const SnackBoxReviewModule = ({ idSubscriptionBox }: { idSubscriptionBox: string
                             {
                                 isAuthorized: true,
                             }
-                        ).then(user => user.username)
+                        ).then((user:any) => user.username)
                     )
                 );
 
