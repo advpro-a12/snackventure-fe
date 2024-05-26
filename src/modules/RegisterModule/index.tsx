@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const RegisterModule: React.FC = () => {
-	const { customFetch, isAuthenticated, isLoading } = useAuthContext();
+	const { customFetch, isAuthenticated, userRoles } = useAuthContext();
 	const router = useRouter();
 
 	const [formData, setFormData] = useState<RegistrationFormData>({
@@ -36,14 +36,16 @@ const RegisterModule: React.FC = () => {
 	};
 
 	useEffect(() => {
-		if (isAuthenticated) {
+		if (isAuthenticated && userRoles.includes("ADMIN")) {
+			router.push("/snackboxes");
+		} else if (isAuthenticated && userRoles.includes("CUSTOMER")) {
 			router.push("/home");
 		}
-	}, [isAuthenticated, router]);
+	}, [isAuthenticated, router, userRoles]);
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-			<div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+			<div className="w-[400px] space-y-8 bg-white p-8 rounded-lg shadow-md">
 				<div>
 					<h2 className="text-center text-3xl font-semibold text-gray-900">
 						Register to Start

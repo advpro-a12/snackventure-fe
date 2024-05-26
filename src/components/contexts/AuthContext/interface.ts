@@ -22,6 +22,12 @@ export interface AuthContextInterface {
 		url: string,
 		options?: RequestInit
 	) => Promise<BaseAPIResponse<T>>;
+	username: string;
+	setUsername: React.Dispatch<React.SetStateAction<string>>;
+	userId: string;
+	setUserId: React.Dispatch<React.SetStateAction<string>>;
+	userRoles: string[];
+	setUserRoles: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export interface RequestInit extends BaseRequestInit {

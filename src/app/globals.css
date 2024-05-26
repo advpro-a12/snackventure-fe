@@ -11,6 +11,26 @@ html {
 body {
 	box-sizing: border-box;
 	scroll-behavior: smooth;
-	margin: 0;
-	padding: 0;
+}
+
+::-webkit-scrollbar,
+::-webkit-scrollbar-corner {
+	width: 10px;
+	height: 10px;
+	background: transparent;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background: content-box currentColor;
+	border: 2px solid transparent;
+	color: #dadce0;
+}
+
+:hover::-webkit-scrollbar-thumb {
+	color: #80868b;
 }

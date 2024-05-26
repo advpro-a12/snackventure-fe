@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const LoginModule: React.FC = () => {
-	const { login, isAuthenticated } = useAuthContext();
+	const { login, isAuthenticated, userRoles } = useAuthContext();
 	const [formData, setFormData] = useState<LoginFormData>({
 		username: "",
 		password: "",
@@ -23,20 +23,22 @@ const LoginModule: React.FC = () => {
 		});
 	};
 
-	const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		login(formData);
 	};
 
 	useEffect(() => {
-		if (isAuthenticated) {
+		if (isAuthenticated && userRoles.includes("ADMIN")) {
+			router.push("/snackboxes");
+		} else if (isAuthenticated && userRoles.includes("CUSTOMER")) {
 			router.push("/home");
 		}
 	}, [isAuthenticated, router]);
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-			<div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+			<div className="w-[400px] space-y-8 bg-white p-8 rounded-lg shadow-md">
 				<div>
 					<h2 className="text-center text-3xl font-semibold text-gray-900">
 						Log in to Continue
