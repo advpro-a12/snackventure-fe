@@ -5,7 +5,7 @@ import { useAuthContext } from "@/components/contexts/AuthContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/elements/Card";
-import { SubscriptionProps, UserProps } from "./interface";
+import { SubscriptionProps } from "./interface";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -36,7 +36,7 @@ const SubscriptionsModule = () => {
 
 			Promise.all(
 				subscriptions.map((subscription) =>
-					customFetch<UserProps>(
+					customFetch(
 						"http://34.87.81.229",
 						`/auth/user/${subscription.customerId}`,
 						{
