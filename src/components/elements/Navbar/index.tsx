@@ -42,7 +42,7 @@ export const Navbar = () => {
 				<div className="container flex justify-between items-center text-lg">
 					<Link href={logoLink}>
 						<Image
-							src={"/Images/logo.svg"}
+							src={"/Images/Logo.svg"}
 							alt="Logo"
 							width={200}
 							height={30}
@@ -97,7 +97,7 @@ export const Navbar = () => {
 		<nav className="py-4 fixed flex justify-center w-full text-black">
 			<div className="container flex justify-between items-center text-lg">
 				<Link href={logoLink}>
-					<Image src={"/Images/logo.svg"} alt="Logo" width={200} height={30} />
+					<Image src={"/Images/Logo.svg"} alt="Logo" width={200} height={30} />
 				</Link>
 				<Link
 					href={"/snackboxes"}
