@@ -5,21 +5,21 @@ import { useAuthContext } from "@/components/contexts/AuthContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const HomeModule = () => {
-	const { isAuthenticated, isLoading } = useAuthContext();
+const MyReviewsModule = () => {
+	const { isAuthenticated, isLoading, userRoles } = useAuthContext();
 	const router = useRouter();
 
 	useEffect(() => {
-		if (!isAuthenticated && !isLoading) {
+		if (!isLoading && (!isAuthenticated || !userRoles.includes("CUSTOMER"))) {
 			router.push("/");
 		}
-	}, [isAuthenticated, isLoading, router]);
+	}, [isAuthenticated, isLoading, router, userRoles]);
 
 	return (
 		<div className="mt-20 w-full h-[calc(100vh-80px)] overflow-auto container">
-			Home
+			MyReviewsModule
 		</div>
 	);
 };
 
-export default HomeModule;
+export default MyReviewsModule;
